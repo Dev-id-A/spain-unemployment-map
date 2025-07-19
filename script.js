@@ -5,16 +5,27 @@
 //SVG   
     const svg = d3.select("body")
                     .append("svg")
-                    .attr("viewBox", `0  0 ${width} ${height}`)
+                    .attr("viewBox", `0 0 ${width} ${height}`)
                     .attr("preserveAspectRatio", "xMidYMid meet")
                     .style("height", "100%")
-                    .style("width", "100%")
-                    .style("background-color", "grey");
+                    .style("width", "100%");
 //Data fetch
-    Promise.all([
-        d3.json("https://unpkg.com/es-atlas/es/municipalities.json"),
-        d3.json("https://servicios.ine.es/wstempus/jsstat/ES/DATASET/29867?nult=1&formato=json")
-    ]).then(([spainMap, data]) => {
-        console.log(spainMap);
-        console.log(data);
-    });
+
+    d3.json("https://unpkg.com/es-atlas/es/provinces.json")
+        .then(spainMap => {
+//Map display 
+            const projection = d3.geoConicConformalSpain();
+            
+            const path = d3.geoPath().projection(projection)
+
+            const provinces = topojson.feature(spainMap, spainMap.objects.provinces).features;
+
+            svg.selectAll("path")
+                .data(provinces)
+                .join("path")
+                .attr("d", path)
+                .attr("fill", "blue")
+                .attr("stroke", "white")
+                .attr("stroke-width", 0.1);
+
+        });
